@@ -1,4 +1,4 @@
-@_spi(Internals) import ComposableArchitecture
+import ComposableArchitecture
 import FlowStacks
 import Foundation
 import SwiftUI
@@ -27,19 +27,8 @@ struct UnobservedTCARouter<
   }
 
   func scopedStore(index: Int, screen: Screen) -> Store<Screen, ScreenAction> {
-    var screen = screen
     let id = identifier(screen, index)
-    return store.scope(
-      id: store.id(state: \.[index], action: \.[id: id]),
-      state: ToState {
-        screen = $0[safe: index]?.screen ?? screen
-        return screen
-      },
-      action: {
-        .routeAction(id: id, action: $0)
-      },
-      isInvalid: { !$0.indices.contains(index) }
-    )
+    return self.store.scope(state: \.[index].screen, action: \.[id: id])
   }
 
   var body: some View {
